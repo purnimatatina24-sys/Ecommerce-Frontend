@@ -144,7 +144,7 @@ export default function App() {
       const newOrder = await response.json();
       if (response.ok) {
         setOrders([...orders, newOrder]);
-        alert(`🎉 Order placed successfully for ${product.name} at ₹${Math.round(finalPrice)}!`);
+        alert(`🎉 Order placed successfully for ${product.name || product.title} at ₹${Math.round(finalPrice)}!`);
       }
     } catch (err) {
       console.error('Error placing order:', err);
@@ -156,7 +156,7 @@ export default function App() {
     try {
       const response = await fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        setProducts(products.filter(p => p.id !== id));
+        setProducts(products.filter(p => (p.id || p._id) !== id));
       }
     } catch (err) {
       console.error('Error deleting product:', err);
@@ -178,7 +178,7 @@ export default function App() {
 
       const updatedOrder = await response.json();
       if (response.ok) {
-        setOrders(orders.map(o => o.id === orderId ? updatedOrder : o));
+        setOrders(orders.map(o => (o.id || o._id) === orderId ? updatedOrder : o));
       }
     } catch (err) {
       console.error('Error updating status:', err);
@@ -223,12 +223,16 @@ export default function App() {
     return acc;
   }, []);
 
-  const categoriesList = ['All', ...new Set(products.map(p => p.category))];
+  const categoriesList = ['All', ...new Set(products.map(p => p.category || 'General'))];
   
   const searchedProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || p.category.toLowerCase() === selectedCategory.toLowerCase();
+    const productName = (p.name || p.title || '').toLowerCase();
+    const productCategory = (p.category || 'general').toLowerCase();
+    const query = searchQuery.toLowerCase().trim();
+
+    const matchesSearch = productName.includes(query) || productCategory.includes(query);
+    const matchesCategory = selectedCategory === 'All' || productCategory === selectedCategory.toLowerCase();
+    
     return matchesSearch && matchesCategory;
   });
 
@@ -376,28 +380,33 @@ export default function App() {
                 <button className="cute-text-btn" onClick={() => setActiveTab('products')}>View All →</button>
               </div>
               <div className="cute-product-grid">
-                {searchedProducts.map(p => (
-                  <div className="cute-product-card" key={p.id}>
-                    <div className="card-image-wrapper">
-                      <img src={p.image} alt={p.name} />
-                      <div className="rating-pill">⭐ 4.8</div>
-                    </div>
-                    <div className="card-info">
-                      <div className="card-title"><strong>{p.category}:</strong> {p.name}</div>
-                      <div className="price-row">
-                        <span className="discounted-price">₹{p.price}</span>
+                {searchedProducts.map(p => {
+                  const productId = p.id || p._id;
+                  const productName = p.name || p.title || 'Untitled';
+                  const productCategory = p.category || 'General';
+                  return (
+                    <div className="cute-product-card" key={productId}>
+                      <div className="card-image-wrapper">
+                        <img src={p.image} alt={productName} />
+                        <div className="rating-pill">⭐ 4.8</div>
+                      </div>
+                      <div className="card-info">
+                        <div className="card-title"><strong>{productCategory}:</strong> {productName}</div>
+                        <div className="price-row">
+                          <span className="discounted-price">₹{p.price}</span>
+                        </div>
+                      </div>
+                      <div style={{ padding: '0 16px 16px 16px', display: 'flex', gap: '8px' }}>
+                        <button onClick={() => handleBuyProduct(p)} className="cute-submit-btn" style={{ flex: 1, padding: '8px' }}>
+                          🛍️ Buy Now
+                        </button>
+                        <button onClick={() => handleDeleteProduct(productId)} className="card-delete-btn" style={{ margin: 0, padding: '8px' }}>
+                          🗑️
+                        </button>
                       </div>
                     </div>
-                    <div style={{ padding: '0 16px 16px 16px', display: 'flex', gap: '8px' }}>
-                      <button onClick={() => handleBuyProduct(p)} className="cute-submit-btn" style={{ flex: 1, padding: '8px' }}>
-                        🛍️ Buy Now
-                      </button>
-                      <button onClick={() => handleDeleteProduct(p.id)} className="card-delete-btn" style={{ margin: 0, padding: '8px' }}>
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -422,28 +431,33 @@ export default function App() {
               {searchedProducts.length === 0 ? (
                 <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#718096' }}>No products found matching "{searchQuery}" 🥺</p>
               ) : (
-                searchedProducts.map(p => (
-                  <div className="cute-product-card" key={p.id}>
-                    <div className="card-image-wrapper">
-                      <img src={p.image} alt={p.name} />
-                      <div className="rating-pill">⭐ 4.8</div>
-                    </div>
-                    <div className="card-info">
-                      <div className="card-title"><strong>{p.category}:</strong> {p.name}</div>
-                      <div className="price-row">
-                        <span className="discounted-price">₹{p.price}</span>
+                searchedProducts.map(p => {
+                  const productId = p.id || p._id;
+                  const productName = p.name || p.title || 'Untitled';
+                  const productCategory = p.category || 'General';
+                  return (
+                    <div className="cute-product-card" key={productId}>
+                      <div className="card-image-wrapper">
+                        <img src={p.image} alt={productName} />
+                        <div className="rating-pill">⭐ 4.8</div>
+                      </div>
+                      <div className="card-info">
+                        <div className="card-title"><strong>{productCategory}:</strong> {productName}</div>
+                        <div className="price-row">
+                          <span className="discounted-price">₹{p.price}</span>
+                        </div>
+                      </div>
+                      <div style={{ padding: '0 16px 16px 16px', display: 'flex', gap: '8px' }}>
+                        <button onClick={() => handleBuyProduct(p)} className="cute-submit-btn" style={{ flex: 1, padding: '8px' }}>
+                          🛍️ Buy Now
+                        </button>
+                        <button onClick={() => handleDeleteProduct(productId)} className="card-delete-btn" style={{ margin: 0, padding: '8px' }}>
+                          🗑️
+                        </button>
                       </div>
                     </div>
-                    <div style={{ padding: '0 16px 16px 16px', display: 'flex', gap: '8px' }}>
-                      <button onClick={() => handleBuyProduct(p)} className="cute-submit-btn" style={{ flex: 1, padding: '8px' }}>
-                        🛍️ Buy Now
-                      </button>
-                      <button onClick={() => handleDeleteProduct(p.id)} className="card-delete-btn" style={{ margin: 0, padding: '8px' }}>
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -465,42 +479,45 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map(o => (
-                    <tr key={o.id}>
-                      <td><code>{o.id.slice(0, 8)}...</code></td>
-                      <td><strong>{o.customerName}</strong></td>
-                      <td className="price-tag">₹{o.total}</td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span 
-                            className="status-pill" 
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => handleUpdateStatus(o.id, o.status)}
-                          >
-                            {o.status} 🔄
-                          </span>
-
-                          {o.status === '✨ Delivered' && (
-                            <button 
-                              onClick={() => handleAddReview(o)}
-                              style={{
-                                background: '#ff3366',
-                                color: 'white',
-                                border: 'none',
-                                padding: '4px 10px',
-                                borderRadius: '12px',
-                                fontSize: '12px',
-                                cursor: 'pointer',
-                                fontWeight: 'bold'
-                              }}
+                  {orders.map(o => {
+                    const orderId = o.id || o._id;
+                    return (
+                      <tr key={orderId}>
+                        <td><code>{orderId.slice(0, 8)}...</code></td>
+                        <td><strong>{o.customerName}</strong></td>
+                        <td className="price-tag">₹{o.total}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span 
+                              className="status-pill" 
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleUpdateStatus(orderId, o.status)}
                             >
-                              ⭐ Rate Item
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                              {o.status} 🔄
+                            </span>
+
+                            {o.status === '✨ Delivered' && (
+                              <button 
+                                onClick={() => handleAddReview(o)}
+                                style={{
+                                  background: '#ff3366',
+                                  color: 'white',
+                                  border: 'none',
+                                  padding: '4px 10px',
+                                  borderRadius: '12px',
+                                  fontSize: '12px',
+                                  cursor: 'pointer',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                ⭐ Rate Item
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
@@ -523,15 +540,20 @@ export default function App() {
             </div>
 
             <div className="cute-product-grid">
-              {searchedProducts.map(p => (
-                <div className="cute-product-card" key={p.id}>
-                  <div className="card-image-wrapper"><img src={p.image} alt={p.name} /></div>
-                  <div className="card-info">
-                    <div className="card-title"><strong>{p.category}:</strong> {p.name}</div>
-                    <span className="discounted-price">₹{p.price}</span>
+              {searchedProducts.map(p => {
+                const productId = p.id || p._id;
+                const productName = p.name || p.title || 'Untitled';
+                const productCategory = p.category || 'General';
+                return (
+                  <div className="cute-product-card" key={productId}>
+                    <div className="card-image-wrapper"><img src={p.image} alt={productName} /></div>
+                    <div className="card-info">
+                      <div className="card-title"><strong>{productCategory}:</strong> {productName}</div>
+                      <span className="discounted-price">₹{p.price}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -667,7 +689,7 @@ export default function App() {
               </div>
               <div className="cute-metric-card peach-glow">
                 <span>Active Inventory Value</span>
-                <h2>₹{products.reduce((acc, p) => acc + (p.price * p.stock), 0).toLocaleString()}</h2>
+                <h2>₹{products.reduce((acc, p) => acc + (Number(p.price || 0) * Number(p.stock || 0)), 0).toLocaleString()}</h2>
                 <small className="sparkle-text">📦 Total stock capital</small>
               </div>
             </div>
