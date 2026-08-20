@@ -304,7 +304,7 @@ export default function App() {
         <div className="vip-modal-backdrop" onClick={() => setShowVipModal(false)}>
           <div className="vip-modal-content" onClick={e => e.stopPropagation()}>
             <div className="vip-modal-header">
-              <h2>👑 Admin VIP Suite</h2>
+              <h2 style={{ color: '#2d3748' }}>👑 Admin VIP Suite</h2>
               <button className="vip-close-btn" onClick={() => setShowVipModal(false)}>✕</button>
             </div>
             <p className="vip-subtitle">Welcome back, Master Administrator! ✨ Here is your store overview:</p>
@@ -336,7 +336,6 @@ export default function App() {
       <main className="cute-main-content">
         {activeTab === 'dashboard' && (
           <>
-            {/* Seamless Borderless Hero Banner */}
             <div className="hero-banner-box">
               <div className="hero-content">
                 <span className="hero-badge">🌸 Special Season Event</span>
@@ -373,7 +372,7 @@ export default function App() {
 
             <div className="cute-card-box">
               <div className="box-header">
-                <h3>🍓 Store Catalog & Instant Checkout</h3>
+                <h3 style={{ color: '#2d3748' }}>🍓 Store Catalog & Instant Checkout</h3>
                 <button className="cute-text-btn" onClick={() => setActiveTab('products')}>View All →</button>
               </div>
               <div className="cute-product-grid">
@@ -403,7 +402,7 @@ export default function App() {
             </div>
 
             <div className="cute-card-box form-card-box">
-              <h3>✨ Add New Product</h3>
+              <h3 style={{ color: '#2d3748' }}>✨ Add New Product</h3>
               <form onSubmit={handleAddProduct} className="cute-form">
                 <input type="text" placeholder="Title" value={name} onChange={e => setName(e.target.value)} required />
                 <input type="text" placeholder="Category" value={category} onChange={e => setCategory(e.target.value)} required />
@@ -418,7 +417,7 @@ export default function App() {
 
         {activeTab === 'products' && (
           <div className="cute-card-box">
-            <h2>🍓 Complete Product Catalog {searchQuery && `(Filtered by "${searchQuery}")`}</h2>
+            <h2 style={{ color: '#2d3748' }}>🍓 Complete Product Catalog {searchQuery && `(Filtered by "${searchQuery}")`}</h2>
             <div className="cute-product-grid" style={{marginTop: '20px'}}>
               {searchedProducts.length === 0 ? (
                 <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#718096' }}>No products found matching "{searchQuery}" 🥺</p>
@@ -452,7 +451,7 @@ export default function App() {
 
         {activeTab === 'orders' && (
           <div className="cute-card-box">
-            <h2>📦 Real Database Orders Tracker</h2>
+            <h2 style={{ color: '#2d3748' }}>📦 Real Database Orders Tracker</h2>
             {orders.length === 0 ? (
               <p style={{ textAlign: 'center', padding: '40px', color: '#718096' }}>No orders placed yet! Click <b>"🛍️ Buy Now"</b> on any product.</p>
             ) : (
@@ -510,7 +509,7 @@ export default function App() {
 
         {activeTab === 'categories' && (
           <div className="cute-card-box">
-            <h2>🏷️ Product Categories Directory</h2>
+            <h2 style={{ color: '#2d3748' }}>🏷️ Product Categories Directory</h2>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '25px', marginTop: '15px', flexWrap: 'wrap' }}>
               {categoriesList.map(cat => (
                 <button 
@@ -539,7 +538,7 @@ export default function App() {
 
         {activeTab === 'customers' && (
           <div className="cute-card-box">
-            <h2>🤍 Real Customers Directory</h2>
+            <h2 style={{ color: '#2d3748' }}>🤍 Real Customers Directory</h2>
             {uniqueCustomers.length === 0 ? (
               <p style={{ textAlign: 'center', padding: '40px', color: '#718096' }}>No customers yet. Place an order to see real customer data here!</p>
             ) : (
@@ -570,7 +569,7 @@ export default function App() {
         {activeTab === 'coupons' && (
           <>
             <div className="cute-card-box">
-              <h2>🎟️ Active Promotional Coupons</h2>
+              <h2 style={{ color: '#2d3748' }}>🎟️ Active Promotional Coupons</h2>
               <div className="cute-product-grid" style={{marginTop: '20px'}}>
                 {coupons.map((coup) => (
                   <div className="cute-product-card" key={coup.id} style={{ padding: '20px', textAlign: 'center', background: '#fff0f3' }}>
@@ -592,7 +591,7 @@ export default function App() {
             </div>
 
             <div className="cute-card-box form-card-box" style={{marginTop: '25px'}}>
-              <h3>✨ Create New Coupon</h3>
+              <h3 style={{ color: '#2d3748' }}>✨ Create New Coupon</h3>
               <form onSubmit={handleAddCoupon} className="coupon-form">
                 <input 
                   type="text" 
@@ -622,7 +621,7 @@ export default function App() {
 
         {activeTab === 'reviews' && (
           <div className="cute-card-box">
-            <h2>⭐ Verified Customer Reviews</h2>
+            <h2 style={{ color: '#2d3748' }}>⭐ Verified Customer Reviews</h2>
             {reviews.length === 0 ? (
               <p style={{ textAlign: 'center', padding: '40px', color: '#718096' }}>No reviews yet! Mark an order as delivered and click "Rate Item" to add one.</p>
             ) : (
@@ -654,7 +653,7 @@ export default function App() {
 
         {activeTab === 'reports' && (
           <div className="cute-card-box">
-            <h2>📈 Business Analytics & Reports</h2>
+            <h2 style={{ color: '#2d3748' }}>📈 Business Analytics & Reports</h2>
             <div className="cute-metrics-grid" style={{marginTop: '20px'}}>
               <div className="cute-metric-card pink-glow">
                 <span>Average Order Value</span>
