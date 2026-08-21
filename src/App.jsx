@@ -8,6 +8,7 @@ export default function App() {
   
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showVipModal, setShowVipModal] = useState(false);
@@ -22,15 +23,6 @@ export default function App() {
   const [couponCodeInput, setCouponCodeInput] = useState('');
   const [couponDiscountInput, setCouponDiscountInput] = useState('');
   const [couponDescInput, setCouponDescInput] = useState('');
-
-  const [reviews, setReviews] = useState(() => {
-    const savedReviews = localStorage.getItem('store_reviews');
-    return savedReviews ? JSON.parse(savedReviews) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem('store_reviews', JSON.stringify(reviews));
-  }, [reviews]);
 
   const [coupons, setCoupons] = useState(() => {
     const savedCoupons = localStorage.getItem('store_coupons');
@@ -48,6 +40,7 @@ export default function App() {
     localStorage.setItem('store_coupons', JSON.stringify(coupons));
   }, [coupons]);
 
+  // Fetch Products, Orders, and Reviews from Backend
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/products`)
       .then(res => res.json())
@@ -58,6 +51,11 @@ export default function App() {
       .then(res => res.json())
       .then(data => setOrders(data))
       .catch(err => console.error('Error fetching orders:', err));
+
+    fetch(`${API_BASE_URL}/api/reviews`)
+      .then(res => res.json())
+      .then(data => setReviews(data))
+      .catch(err => console.error('Error fetching reviews:', err));
   }, []);
 
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
@@ -68,7 +66,7 @@ export default function App() {
       const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, category, price, stock, image })
+        body: JSON.stringify({ name, category, price: Number(price), stock: Number(stock), image })
       });
       
       const savedProduct = await response.json();
@@ -187,7 +185,7 @@ export default function App() {
     }
   };
 
-  const handleAddReview = (order) => {
+  const handleAddReview = async (order) => {
     const ratingNum = prompt('Rate your experience from 1 to 5 stars ⭐:', '5');
     if (!ratingNum) return;
     
@@ -196,17 +194,27 @@ export default function App() {
 
     const stars = '⭐'.repeat(Math.min(Math.max(parseInt(ratingNum) || 5, 1), 5));
     
-    const newReview = {
-      id: reviews.length + 1,
-      product: 'Store Item',
-      customer: order.customerName,
-      rating: stars,
-      comment: comment,
-      date: new Date().toISOString().split('T')[0]
-    };
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product: 'Store Item',
+          customer: order.customerName,
+          rating: stars,
+          comment: comment,
+          date: new Date().toISOString().split('T')[0]
+        })
+      });
 
-    setReviews([newReview, ...reviews]);
-    alert('✨ Thank you! Your verified review has been published to the Reviews tab.');
+      const newReview = await response.json();
+      if (response.ok) {
+        setReviews([newReview, ...reviews]);
+        alert('✨ Thank you! Your verified review has been saved to MongoDB & published.');
+      }
+    } catch (err) {
+      console.error('Error saving review:', err);
+    }
   };
 
   const uniqueCustomers = orders.reduce((acc, order) => {
@@ -660,15 +668,18 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {reviews.map(r => (
-                    <tr key={r.id}>
-                      <td><strong>{r.product}</strong></td>
-                      <td>{r.customer}</td>
-                      <td>{r.rating}</td>
-                      <td><em>"{r.comment}"</em></td>
-                      <td>{r.date}</td>
-                    </tr>
-                  ))}
+                  {reviews.map(r => {
+                    const reviewId = r.id || r._id;
+                    return (
+                      <tr key={reviewId}>
+                        <td><strong>{r.product}</strong></td>
+                        <td>{r.customer}</td>
+                        <td>{r.rating}</td>
+                        <td><em>"{r.comment}"</em></td>
+                        <td>{r.date}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
