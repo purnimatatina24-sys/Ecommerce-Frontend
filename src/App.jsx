@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const API_BASE_URL = 'https://ecommerce-backend-zh5y.onrender.com';
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   
@@ -47,12 +49,12 @@ export default function App() {
   }, [coupons]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
+    fetch(`${API_BASE_URL}/api/products`)
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error('Error fetching products:', err));
 
-    fetch('http://localhost:5000/api/orders')
+    fetch(`${API_BASE_URL}/api/orders`)
       .then(res => res.json())
       .then(data => setOrders(data))
       .catch(err => console.error('Error fetching orders:', err));
@@ -63,7 +65,7 @@ export default function App() {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, category, price, stock, image })
@@ -131,7 +133,7 @@ export default function App() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -154,7 +156,7 @@ export default function App() {
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product? 🥺')) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`, { method: 'DELETE' });
       if (response.ok) {
         setProducts(products.filter(p => (p.id || p._id) !== id));
       }
@@ -170,7 +172,7 @@ export default function App() {
     else nextStatus = 'Processing 🌸';
 
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus })
